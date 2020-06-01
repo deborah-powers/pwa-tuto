@@ -1,0 +1,15 @@
+{
+	"name": "tuto de pwa",
+	"short_name": "pwa-tuto",
+	"description": "tutoriel de développement d'une pwa basique",
+	"icons": [
+		{	"src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png"	},
+		{	"src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png"	}
+	],
+	"version": "1",
+	"lang": "fr",
+	"start_url": "/tutoriels/pwa-tuto/pwa.html",
+	"display": "standalone",
+	"background_color": "ivory",
+	"theme_color": "ivory"
+}

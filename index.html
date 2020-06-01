@@ -1,0 +1,215 @@
+<!DOCTYPE html><html><head>
+	<title>tutoriel de progressive web app</title>
+	<meta charset='utf-8'/>
+	<meta name='viewport' content='width=device-width,initial-scale=1'/>
+	<meta name='author' content='http://www.deborah-powers.fr'/>
+	<meta name='subject' content='programmation'/>
+	<meta name='link' content='o'/>
+	<meta name='autlink' content=''/>
+	<link rel='stylesheet' type='text/css' href='../../library-css/structure.css'/>
+	<link rel='stylesheet' type='text/css' href='../../library-css/color.css' media='screen'/>
+	<base target='_blank'>
+	<style type='text/css'>
+		body >* { margin: 0 2%; }
+		nav { margin: 0; }
+		h2, hr {
+			border-top: double 8px var(--button-bg);
+			margin-top: 2%;
+		}
+		hr { background: none; }
+		a { display: block; }
+		pre {
+			padding: 1%;
+			border: solid 2px var(--button-bg);
+			background-color: var(--input-bg);
+		}
+		pre * {
+			line-height: 1em;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head><body>
+	<nav>
+		<a href='../..'>accueil</a>
+		<a href='../..#!/tutriels'>tutriels</a>
+		<a href='pwa.html'>résultat du tuto</a>
+		<a href=''>code</a>
+	</nav>
+	<h1>Tutoriel de développement d'une progressive web app simple (pwa)</h1>
+	<p>Comprendre le fonctionnement d'une progressive web app en développant une pwa basique.</p>
+	<p>Une pwa est une application mobile.</p>
+	<p>Elle fonctionne grâce au navigateur web, que le téléphone soit un android ou un ios, voir sur un ordinateur.</p>
+	<p>C'est en fait un site web qui respecte certaines normes, dont les plus importantes sont décrites ci-dessous.</p>
+	<h2>L'hébergement</h2>
+	<p>Par défaut, une pwa se somporte comme un site ordinaire.</p>
+	<p>Elle doit être hébergée sur un site en https afin d'être installable.</p>
+	<p>Pour ce faire, vous devez installer un certificat ssl sur votre site.</p>
+	<h2>Conseils</h2>
+	<p>Je conseille le développement avec le navigateur chrome:</p>
+	<ul>
+		<li>Il est bavard quand il rencontre une erreur</li>
+		<li>L'extension lighthouse donne des informations utiles sur les problèmes de l'appli</li>
+	</ul>
+	<h2>L'architecture</h2>
+	<p>Myapp est le nom du dossier racine de mon appli.</p>
+	<p>Cinq fichiers indispensables pour toutes les pwa.</p>
+	<pre>
+myapp/
+	manifest.webmanifest
+	service-worker.js
+	service-launcher.js
+	index.html
+	icones/
+		icone-192.png
+		icone-512.png
+	</pre>
+	<h2>Le manifest</h2>
+	<pre>
+{
+	"name": "tuto de pwa",
+	"short_name": "pwa-tuto",
+	"description": "tutoriel de développement d'une pwa basique",
+	"icons": [
+		{	"src": "icones/icone-192.png", "sizes": "192x192", "type": "image/png"	},
+		{	"src": "icones/icone-512.png", "sizes": "512x512", "type": "image/png"	}
+	],
+	"version": "1",
+	"lang": "fr",
+	"start_url": "/tutoriels/pwa-tuto/index.html",
+	"display": "standalone",
+	"background_color": "ivory",
+	"theme_color": "ivory"
+}
+	</pre>
+	<p>Name: Nom de mon application</p>
+	<p>Short_name: Nom qui apparait en-dessous de l'icône sur l'écran du smartphone</p>
+	<p>Icons: Liste des icônes.</p>
+	<p>Une icône est une image carrée au format png. Des icône de 192*192 px et de 512*512 sont obligatoires, mais d'autres tailles d'icônes peuvent être rajoutées, comme 144*144 px.</p>
+	<p>Pour une icône:</p>
+	<ul>
+		<li>Src: Fichier source</li>
+		<li>Sizes: Dimensions de l'image</li>
+		<li>Type: Type de l'image, ici png</li>
+	</ul>
+	<p>Start_url: Page d'entrée de l'appli. Il faut préciser le chemin du fichier à partir de la racine du site.</p>
+	<p>Display: Comment s'affiche l'application.</p>
+	<ul>
+		<li>Standalone: Comme un logiciel classique</li>
+		<li>Browser: Comme une page web. Affichage par défaut.</li>
+		<li>Fullscreen: Dans tout l'écran</li>
+		<li>Minimal-ui: Entre browser et standalone.</li>
+	</ul>
+	<p>Background_color et theme_color: Couleur d'arrière-plan de l'appli.</p>
+	<p>Lang: Langage de l'appli, ici le français. Ce champ est facultatif.</p>
+	<h2>Le service worker</h2>
+	<p>Ce script transforme mon site en pwa. Il doit être placé à la racine du site, dans myapp.</p>
+	<p>Lors de l'installation de l'appli,</p>
+	<ul>
+		<li>Il crée un cache</li>
+		<li>Il stoque les fichiers importants dans le cache</li>
+	</ul>
+	<p>Lors du lancement de l'appli,</p>
+	<ul>
+		<li>Il ré-ouvre le cache</li>
+		<li>Il récupère les fichiers</li>
+	</ul>
+	<p>Et oui, une pwa est en fait un site web dont les fichiers sont stoquées dans la mémoire du téléphone, ce qui les rend disponibles hors connection.</p>
+	<p>Tous les fichiers, sauf le service worker et les icônes doivent être stoqués.</p>
+	<pre>
+// gérer le cache
+const cacheName = 'pwa-tuto';
+const filesToCache =[
+	'/tutoriels/pwa-tuto/',
+	'/tutoriels/pwa-tuto/index.html',
+	'/tutoriels/pwa-tuto/service-launcher.js'
+];
+// mettre en cache le contenu de l'app
+self.addEventListener ('install', function (event){
+	event.waitUntil (caches.open (cacheName).then (function (cache){
+		return cache.addAll (filesToCache);
+}));});
+// rendre le contenu de l'app hors-ligne
+self.addEventListener ('fetch', function (event){
+	event.respondWith (
+	caches.match (event.request).then (function (response){
+		return response || fetch (event.request);
+}));});
+	</pre>
+	<p>Le service worker n'est pas conservé dans le cache. Il ne peut accéder au dom de la page html.</p>
+	<p>Préciser le chemin des fichiers à cacher depuis la racine du site.</p>
+	<h2>Le launcher</h2>
+	<p>Lance le service worker, gère la façon dont l'appli s'installe. Il communique avec le dom de la page.</p>
+	<pre>
+// afficher l'état de l'appli. facultatif
+function showResponse (responseMessage){
+	console.log (responseMessage);
+	var responseTag = document.getElementById ('worker-state');
+	responseTag.innerHTML = responseMessage;
+}
+// vérifier si le service-worker est installable
+window.onload = function(){
+	'use strict';
+	var responseMessage = 'votre navigateur ne supporte pas de service-worker';
+	if ('serviceWorker' in navigator){
+		navigator.serviceWorker.register ('./service-worker.js');
+		responseMessage = 'votre navigateur supporte le service-worker';
+	}
+	showResponse (responseMessage);
+}
+// rendre mon application installable
+var buttonInstall = document.getElementsByTagName ('button')[0];
+var deferredPrompt;
+window.addEventListener ('beforeinstallprompt', function (event){
+	// empêcher l'affichage de la popup d'installation
+	event.preventDefault();
+	deferredPrompt = event;
+	// indiquer que l'appli est installable
+	buttonInstall.innerHTML = 'installez-moi';
+	showResponse ("vous pouvez installer l'appli");
+});
+buttonInstall.addEventListener ('click', function(){
+	if (! deferredPrompt) showResponse ("l'application est déjà installée");
+	else{
+		deferredPrompt.prompt();
+		deferredPrompt.userChoice.then (function (choiceResult){
+			if (choiceResult.outcome === 'accepted') responseMessage = "l'application s'installe";
+			else responseMessage = "l'application n'est pas installée";
+			showResponse (responseMessage);
+});}});
+// vérifier si l'appli est installée
+window.addEventListener ('appinstalled', function (event){ showResponse ("l'application est installée"); });
+	</pre>
+	<h2>La page</h2>
+	<p>Elle doit contenir certains éléments:</p>
+	<ul>
+		<li>Le manifest, en tant que link</li>
+		<li>Le script du launcher</li>
+		<li>L'icône de l'appli, de trois façons différentes</li>
+		<li>La couleur du thème précisée dans le manifest</li>
+		<li>Le bouton d'installation</li>
+	</ul>
+	<pre>
+		&lt;head&gt;
+			&lt;title&gt;tuto de pwa&lt;/title&gt;
+			&lt;meta charset='utf-8'/&gt;
+			&lt;meta name='viewport' content='width=device-width,initial-scale=1'/&gt;
+			&lt;link rel='manifest' href='manifest.webmanifest'/&gt;
+			&lt;link rel='icon' type='image/png' href='icones/icone-192.png'/&gt;
+			&lt;link rel='apple-touch-icon' type='image/png' href='icones/icone-192.png'/&gt;
+			&lt;meta name='msapplication-TileImage' content='icones/icone-192.png'&gt;
+			&lt;meta name='theme-color' content='ivory'/&gt;
+			&lt;meta name='msapplication-TileColor' content='ivory'&gt;
+			&lt;meta name='apple-mobile-web-app-capable' content='yes'&gt;
+			&lt;meta name='apple-mobile-web-app-status-bar-style' content='black'&gt;
+			&lt;meta name='apple-mobile-web-app-title' content='pwa tuto'&gt;
+		&lt;/head&gt;
+		&lt;body&gt;
+			&lt;h1&gt;bonjour&lt;/h1&gt;
+			&lt;p&gt;j'apprend à coder une progressive web app.&lt;/p&gt;
+			&lt;p id='worker-state'&gt;service-worker en chargement.&lt;/p&gt;
+			&lt;button&gt;l'application est installée&lt;/button&gt;
+			&lt;script type='text/javascript' src='service-launcher.js'&gt;&lt;/script&gt;
+		&lt;/body&gt;
+	</pre>
+</body></html>
