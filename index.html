@@ -2,10 +2,6 @@
 	<title>tutoriel de progressive web app</title>
 	<meta charset='utf-8'/>
 	<meta name='viewport' content='width=device-width,initial-scale=1'/>
-	<meta name='author' content='http://www.deborah-powers.fr'/>
-	<meta name='subject' content='programmation'/>
-	<meta name='link' content='o'/>
-	<meta name='autlink' content=''/>
 	<link rel='stylesheet' type='text/css' href='../../library-css/structure.css'/>
 	<link rel='stylesheet' type='text/css' href='../../library-css/color.css' media='screen'/>
 	<base target='_blank'>
@@ -34,7 +30,7 @@
 		<a href='../..'>accueil</a>
 		<a href='../..#!/tutriels'>tutriels</a>
 		<a href='pwa.html'>résultat du tuto</a>
-		<a href=''>code</a>
+		<a href='https://github.com/deborah-powers/pwa-tuto'>récupérer le code</a>
 	</nav>
 	<h1>Tutoriel de développement d'une progressive web app simple (pwa)</h1>
 	<p>Comprendre le fonctionnement d'une progressive web app en développant une pwa basique.</p>
@@ -76,7 +72,7 @@ myapp/
 	],
 	"version": "1",
 	"lang": "fr",
-	"start_url": "/tutoriels/pwa-tuto/index.html",
+	"start_url": "/myapp/index.html",
 	"display": "standalone",
 	"background_color": "ivory",
 	"theme_color": "ivory"
@@ -120,9 +116,9 @@ myapp/
 // gérer le cache
 const cacheName = 'pwa-tuto';
 const filesToCache =[
-	'/tutoriels/pwa-tuto/',
-	'/tutoriels/pwa-tuto/index.html',
-	'/tutoriels/pwa-tuto/service-launcher.js'
+	'/myapp/',
+	'/myapp/index.html',
+	'/myapp/service-launcher.js'
 ];
 // mettre en cache le contenu de l'app
 self.addEventListener ('install', function (event){
